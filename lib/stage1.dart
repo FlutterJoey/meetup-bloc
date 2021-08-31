@@ -43,7 +43,12 @@ class _StageOneScreenState extends State<StageOneScreen> {
                 .map((e) => ProductListing(
                       product: e,
                       onDelete: (product) {
-                        this.products.remove(product);
+                        setState(() {
+                          this.products.remove(product);
+                        });
+                      },
+                      onUpdate: (product) {
+                        setState(() {});
                       },
                     ))
                 .toList(),

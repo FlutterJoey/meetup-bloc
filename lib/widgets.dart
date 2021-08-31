@@ -171,7 +171,13 @@ class _CreateProductDialogState extends State<CreateProductDialog> {
 class ProductListing extends StatelessWidget {
   final Product product;
   final void Function(Product) onDelete;
-  const ProductListing({Key? key, required this.product, required this.onDelete}) : super(key: key);
+  final void Function(Product) onUpdate;
+  const ProductListing(
+      {Key? key,
+      required this.product,
+      required this.onDelete,
+      required this.onUpdate})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +192,13 @@ class ProductListing extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Name', style: Theme.of(context).textTheme.bodyText1),
-                  Text(product.name, style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),),
+                  Text(
+                    product.name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        ?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
             ),
@@ -210,7 +222,13 @@ class ProductListing extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Icon(Icons.store),
+                  IconButton(
+                    icon: Icon(Icons.store),
+                    onPressed: () {
+                      product.stock -= 1;
+                      this.onUpdate(product);
+                    },
+                  ),
                   Text(product.stock.toString(),
                       style: Theme.of(context).textTheme.bodyText1),
                 ],
@@ -219,7 +237,9 @@ class ProductListing extends StatelessWidget {
             Expanded(
               child: IconButton(
                 icon: Icon(Icons.delete_forever),
-                onPressed: () {},
+                onPressed: () {
+                  this.onDelete(product);
+                },
               ),
             )
           ],

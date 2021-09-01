@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:meetup_bloc/products.dart';
+import 'package:uuid/uuid.dart';
 
 class AddButton extends StatelessWidget {
   final void Function(Product) onProductCreated;
@@ -138,6 +139,7 @@ class _CreateProductDialogState extends State<CreateProductDialog> {
 
                   if (text.isNotEmpty && price != null && stock != null) {
                     Navigator.of(context).pop(Product(
+                      id: DateTime.now().millisecondsSinceEpoch.toString() + Uuid().v4(),
                       name: text,
                       price: price,
                       stock: stock,

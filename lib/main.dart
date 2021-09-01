@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meetup_bloc/app_presentation.dart';
 import 'package:meetup_bloc/slides.dart';
@@ -24,6 +27,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   BuildContext? buildContext;
   String currentSlide = 'start';
+  bool throttled = false;
 
   @override
   void initState() {
@@ -35,8 +39,10 @@ class _MyAppState extends State<MyApp> {
         .snapshots()
         .listen((event) {
       if (event.exists && buildContext != null && mounted) {
-        String slide = event.get('slide');
-        moveToSlide(slide, buildContext!);
+        SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
+          String slide = event.get('slide');
+          moveToSlide(slide, buildContext!);
+        });
       }
     });
   }
@@ -44,11 +50,16 @@ class _MyAppState extends State<MyApp> {
   void moveToSlide(String slide, BuildContext context) async {
     if (this.currentSlide != slide) {
       this.currentSlide = slide;
-
-      await FirebaseFirestore.instance
-          .collection('presentations')
-          .doc('meetup-bloc')
-          .update({'slide': slide});
+      if (!throttled) {
+        throttled = true;
+        Timer(Duration(seconds: 3), () {
+          throttled = false;
+        });
+        await FirebaseFirestore.instance
+            .collection('presentations')
+            .doc('meetup-bloc')
+            .update({'slide': slide});
+      }
       Navigator.of(context).pushReplacementNamed(slide);
     }
   }
@@ -70,7 +81,9 @@ class _MyAppState extends State<MyApp> {
             onNext: () => moveToSlide('stage2', context),
           ),
       'stage2': (context) => AppPresentation(
-            app: StageTwoScreen(),
+            app: StageTwoScreen(
+              productService: FBProductService(),
+            ),
             explanation: SlideTwo(),
             onNext: () => moveToSlide('stage3', context),
             onPrevious: () => moveToSlide('stage1', context),

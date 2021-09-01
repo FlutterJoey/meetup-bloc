@@ -57,8 +57,8 @@ class _AppPresentationState extends State<AppPresentation> {
                     child: Container(
                       alignment: Alignment.center,
                       child: Container(
-                        height: 40 * 16,
-                        width: 40 * 9,
+                        height: 60 * 16,
+                        width: 60 * 9,
                         padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
